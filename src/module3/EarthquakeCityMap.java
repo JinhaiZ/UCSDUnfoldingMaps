@@ -80,6 +80,8 @@ public class EarthquakeCityMap extends PApplet {
 	    	System.out.println(f.getProperties());
 	    	Object magObj = f.getProperty("magnitude");
 	    	float mag = Float.parseFloat(magObj.toString());
+	    	//System.out.println("mag: "+mag);
+	    	//System.out.println("location:  "+f.getLocation());
 	    	// PointFeatures also have a getLocation method
 	    }
 	    
@@ -88,6 +90,24 @@ public class EarthquakeCityMap extends PApplet {
 	    int yellow = color(255, 255, 0);
 	    
 	    //TODO: Add code here as appropriate
+	    for (PointFeature f : earthquakes){
+	    	SimplePointMarker e =  createMarker(f);
+	    	Object magObj = f.getProperty("magnitude");
+	    	float mag = Float.parseFloat(magObj.toString());
+	    	if (mag < 4.0){
+	    		e.setColor(color(0,0,255));
+			    e.setRadius((float) 5.0);
+	    	} else if (mag <= 4.9) {
+	    		e.setColor(color(255,255,0));
+			    e.setRadius((float) 10.0);
+	    	} else {
+	    		e.setColor(color(255,0,0));
+			    e.setRadius((float) 15.0);
+	    	}
+
+		    markers.add(e);
+		    map.addMarkers(markers);
+	    }
 	}
 		
 	// A suggested helper method that takes in an earthquake feature and 
@@ -103,6 +123,24 @@ public class EarthquakeCityMap extends PApplet {
 	    background(10);
 	    map.draw();
 	    addKey();
+	    fill(245,244,231);
+	    rect(20, 50, 160, 250);
+	    fill(0, 0, 0);
+	    text("Earthquake Key", 40, 80);
+	    fill(0, 0, 0);
+	    text("5.0+ Magnitude", 60, 130);
+	    fill(0, 0, 0);
+	    text("4.0+ Magnitude", 60, 180);
+	    fill(0, 0, 0);
+	    text("Below", 60, 230);
+	    fill(255,0,0);
+	    ellipse(40, 125, 15, 15);
+	    fill(255,255,0);
+	    ellipse(40, 175, 10, 10);
+	    fill(0,0,255);
+	    ellipse(40, 225, 5, 5);
+	    
+	    
 	}
 
 
