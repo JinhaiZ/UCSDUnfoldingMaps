@@ -1,6 +1,7 @@
 package module4;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import de.fhpotsdam.unfolding.UnfoldingMap;
@@ -186,6 +187,23 @@ public class EarthquakeCityMap extends PApplet {
 	private void printQuakes() 
 	{
 		// TODO: Implement this method
+		HashMap<String, Integer> contryQuake = new HashMap<String, Integer>();
+		int oceanNum = 0;
+		for (Marker country: quakeMarkers) {
+			if (country instanceof LandQuakeMarker){
+				String name = ((LandQuakeMarker) country).getCountry();
+				if(contryQuake.containsKey(name)) {
+					int original = contryQuake.get(name);
+					contryQuake.put(name, original+1);
+				}
+				else
+					contryQuake.put(name, 1);
+			}
+			else
+				oceanNum ++;
+		}
+		contryQuake.put("ocean", oceanNum);
+		System.out.println(contryQuake);
 	}
 	
 	
