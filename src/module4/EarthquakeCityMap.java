@@ -170,8 +170,6 @@ public class EarthquakeCityMap extends PApplet {
 		for(Marker country: countryMarkers ) {
 			if ( isInCountry(earthquake, country) )
 				return true;
-			else
-				return false;
 		}
 		
 		// not inside any country
@@ -202,7 +200,7 @@ public class EarthquakeCityMap extends PApplet {
 			else
 				oceanNum ++;
 		}
-		contryQuake.put("ocean", oceanNum);
+		contryQuake.put("OCEAN QUAKES", oceanNum);
 		System.out.println(contryQuake);
 	}
 	
