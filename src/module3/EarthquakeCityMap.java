@@ -123,6 +123,15 @@ public class EarthquakeCityMap extends PApplet {
 	    background(10);
 	    map.draw();
 	    addKey();
+	    
+	}
+
+
+	// helper method to draw key in GUI
+	// TODO: Implement this method to draw the key
+	private void addKey() 
+	{	
+		// Remember you can use Processing's graphics methods here
 	    fill(245,244,231);
 	    rect(20, 50, 160, 250);
 	    fill(0, 0, 0);
@@ -139,16 +148,5 @@ public class EarthquakeCityMap extends PApplet {
 	    ellipse(40, 175, 10, 10);
 	    fill(0,0,255);
 	    ellipse(40, 225, 5, 5);
-	    
-	    
-	}
-
-
-	// helper method to draw key in GUI
-	// TODO: Implement this method to draw the key
-	private void addKey() 
-	{	
-		// Remember you can use Processing's graphics methods here
-	
 	}
 }
