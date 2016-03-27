@@ -201,7 +201,10 @@ public class EarthquakeCityMap extends PApplet {
 				oceanNum ++;
 		}
 		contryQuake.put("OCEAN QUAKES", oceanNum);
-		System.out.println(contryQuake);
+		for (String name: contryQuake.keySet()) {
+			System.out.println(name + ": " + contryQuake.get(name));
+		}
+		
 	}
 	
 	
