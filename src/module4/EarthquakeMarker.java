@@ -65,9 +65,20 @@ public abstract class EarthquakeMarker extends SimplePointMarker
 		drawEarthquake(pg, x, y);
 		
 		// OPTIONAL TODO: draw X over marker if within past day		
-		
-		// reset to previous styling
-		pg.popStyle();
+		String age = getStringProperty("age");
+		if ("Past Hour".equals(age) || "Past Day".equals(age)) {
+			
+			pg.strokeWeight(2);
+			int buffer = 2;
+			pg.line(x-(radius+buffer), 
+					y-(radius+buffer), 
+					x+radius+buffer, 
+					y+radius+buffer);
+			pg.line(x-(radius+buffer), 
+					y+(radius+buffer), 
+					x+radius+buffer, 
+					y-(radius+buffer));
+		}
 		
 	}
 	
