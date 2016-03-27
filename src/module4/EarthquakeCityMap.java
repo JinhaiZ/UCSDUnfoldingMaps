@@ -116,6 +116,7 @@ public class EarthquakeCityMap extends PApplet {
 	    // (3) Add markers to map
 	    //     NOTE: Country markers are not added to the map.  They are used
 	    //           for their geometric properties
+	    //map.addMarkers(countryMarkers);
 	    map.addMarkers(quakeMarkers);
 	    map.addMarkers(cityMarkers);
 	    
@@ -165,6 +166,12 @@ public class EarthquakeCityMap extends PApplet {
 		// IMPLEMENT THIS: loop over all countries to check if location is in any of them
 		
 		// TODO: Implement this method using the helper method isInCountry
+		for(Marker country: countryMarkers ) {
+			if ( isInCountry(earthquake, country) )
+				return true;
+			else
+				return false;
+		}
 		
 		// not inside any country
 		return false;
