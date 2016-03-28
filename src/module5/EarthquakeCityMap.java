@@ -168,27 +168,34 @@ public class EarthquakeCityMap extends PApplet {
 		// Hint: You probably want a helper method or two to keep this code
 		// from getting too long/disorganized
 
-		Marker marker = findMarker();
-		if (marker != null && lastClicked == null) {
-			lastClicked = (CommonMarker) marker;
-			hideMarkers(marker);
-		}
-		else
-			lastClicked = null;
+		if (lastClicked != null) {
 			unhideMarkers();
+			lastClicked = null;	
+		}
+		else if (lastClicked == null) {
+			Marker marker = findMarker();
+			if (marker!=null){
+				lastClicked = (CommonMarker) marker;
+				hideMarkers(marker);
+			}
+			else {
+				unhideMarkers();
+				lastClicked = null;	
+				}
+			}
 
 	}
 
 	//find marker
 	private Marker findMarker() {
 		for(Marker marker : quakeMarkers) {
-			if (((CommonMarker) marker).getClicked()) {
+			if (!marker.isHidden() && marker.isInside(map, mouseX, mouseY)) {
 				System.out.println("quakeMarkers clicked!");
 				return marker;
 				}
 			}
 		for(Marker marker : cityMarkers) {
-			if (((CommonMarker) marker).getClicked()) {
+			if (!marker.isHidden() && marker.isInside(map, mouseX, mouseY)) {
 				System.out.println("cityMarkers clicked!");
 				return marker;
 				}
