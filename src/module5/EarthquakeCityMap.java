@@ -167,8 +167,65 @@ public class EarthquakeCityMap extends PApplet {
 		// TODO: Implement this method
 		// Hint: You probably want a helper method or two to keep this code
 		// from getting too long/disorganized
+
+		Marker marker = findMarker();
+		if (marker != null && lastClicked == null) {
+			lastClicked = (CommonMarker) marker;
+			hideMarkers(marker);
+		}
+		else
+			lastClicked = null;
+			unhideMarkers();
+
 	}
+
+	//find marker
+	private Marker findMarker() {
+		for(Marker marker : quakeMarkers) {
+			if (((CommonMarker) marker).getClicked()) {
+				System.out.println("quakeMarkers clicked!");
+				return marker;
+				}
+			}
+		for(Marker marker : cityMarkers) {
+			if (((CommonMarker) marker).getClicked()) {
+				System.out.println("cityMarkers clicked!");
+				return marker;
+				}
+			}
+		return null;
+		}
+		
+		
 	
+	
+	
+	//hide markers
+	private void hideMarkers(Marker middle) {
+		Location location = middle.getLocation();
+		if (middle instanceof EarthquakeMarker) {
+			double threatCircle = ((EarthquakeMarker) middle).threatCircle();
+			for(Marker marker : quakeMarkers) {
+				if (!marker.equals(middle)) 
+					marker.setHidden(true);
+			}
+			for(Marker marker : cityMarkers) {
+				if (marker.getDistanceTo(location) > threatCircle)
+					marker.setHidden(true);
+				}
+			}
+		else{
+			for(Marker marker : cityMarkers) {
+				if (!marker.equals(middle))
+					marker.setHidden(true);
+				}
+			for(Marker marker : quakeMarkers) {
+				double threatCircle = ((EarthquakeMarker) marker).threatCircle();
+				if (marker.getDistanceTo(location) > threatCircle)
+					marker.setHidden(true);
+			}
+		}
+	}
 	
 	// loop over and unhide all markers
 	private void unhideMarkers() {
