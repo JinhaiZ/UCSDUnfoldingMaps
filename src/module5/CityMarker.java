@@ -52,6 +52,10 @@ public class CityMarker extends CommonMarker {
 	{
 		
 		// TODO: Implement this method
+		String name = this.getStringProperty("name");
+		String county = this.getCountry();
+		float population = this.getPopulation(); 
+		pg.text(name+" "+county+" "+population, x, y);
 	}
 	
 	
