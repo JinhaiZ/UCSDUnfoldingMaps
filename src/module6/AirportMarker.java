@@ -5,6 +5,7 @@ import java.util.List;
 import de.fhpotsdam.unfolding.data.Feature;
 import de.fhpotsdam.unfolding.data.PointFeature;
 import de.fhpotsdam.unfolding.marker.SimpleLinesMarker;
+import processing.core.PConstants;
 import processing.core.PGraphics;
 
 /** 
@@ -15,6 +16,8 @@ import processing.core.PGraphics;
  *
  */
 public class AirportMarker extends CommonMarker {
+	
+	public static int ELL_SIZE = 5;  // The size of the ellipse marker
 	public static List<SimpleLinesMarker> routes;
 	
 	public AirportMarker(Feature city) {
@@ -33,10 +36,38 @@ public class AirportMarker extends CommonMarker {
 	@Override
 	public void showTitle(PGraphics pg, float x, float y) {
 		 // show rectangle with title
+		String name = getCity() + " " + getCountry() + " ";
+		String TZ = "Time Zone: " + getTimezone();
 		
+		pg.pushStyle();
+		
+		pg.fill(255, 255, 255);
+		pg.textSize(12);
+		pg.rectMode(PConstants.CORNER);
+		pg.rect(x, y-ELL_SIZE-39, Math.max(pg.textWidth(name), pg.textWidth(TZ)) + 6, 39);
+		pg.fill(0, 0, 0);
+		pg.textAlign(PConstants.LEFT, PConstants.TOP);
+		pg.text(name, x+3, y-ELL_SIZE-33);
+		pg.text(TZ, x+3, y - ELL_SIZE -18);
+		
+		pg.popStyle();
 		// show routes
 		
 		
+	}
+	private String getCity()
+	{
+		return getStringProperty("name");
+	}
+	
+	private String getCountry()
+	{
+		return getStringProperty("country");
+	}
+	
+	private String getTimezone()
+	{
+		return getStringProperty("timezone");
 	}
 	
 }
