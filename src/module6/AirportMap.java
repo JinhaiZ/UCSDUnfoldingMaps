@@ -51,17 +51,22 @@ public class AirportMap extends PApplet {
 	// Hover method
 	private CommonMarker lastSelected;
 	private CommonMarker lastClicked;
-
+	// Clock
+	int cx, cy;
+	float secondsRadius;
+	float minutesRadius;
+	float hoursRadius;
+	float clockDiameter;
 	
 	
 	public void setup() {
 		// setting up PAppler
-		size(900,700, OPENGL);
+		size(1000,700, OPENGL);
 		provider1 = new Google.GoogleMapProvider();
 	    provider2 = new Microsoft.HybridProvider();
 		
 		// setting up map and default events
-		map = new UnfoldingMap(this, 200, 50, 650, 600, provider1);
+		map = new UnfoldingMap(this, 200, 50, 800, 600, provider1);
 		MapUtils.createDefaultEventDispatcher(this, map);
 		
 		// get features from airport data
@@ -75,7 +80,9 @@ public class AirportMap extends PApplet {
 		for(PointFeature feature : features) {
 			AirportMarker m = new AirportMarker(feature);
 	
-			m.setRadius(5);
+			//m.setRadius(15);
+			//int color = color(0,0,255);
+			//m.setColor(color(0,0,255));
 			//System.out.println(m.getProperties());
 			airportMarkers.add(m);
 			
@@ -124,6 +131,15 @@ public class AirportMap extends PApplet {
 		rectX = width/2-rectSize-10;
 		rectY = height/2-rectSize/2;
 		ellipseMode(CENTER);
+		// Setup clock
+		stroke(255);
+		int radius = min(width, height) / 2;
+		secondsRadius = (float) (radius * 0.72);
+		minutesRadius = (float) (radius * 0.60);
+		hoursRadius = (float) (radius * 0.50);
+		clockDiameter = (float) (radius * 1.8);		  
+		cx = width / 2;
+		cy = height / 2;
 	}
 	
 	public void draw() {
@@ -131,8 +147,10 @@ public class AirportMap extends PApplet {
 		map.draw();
 		addKey();
 		addButton();
+		addClock();
 		//map.getZoomLevel();
 	}
+	// keyboard
 	public void keyPressed() {
 	    if (key == '1') {
 	        map.mapDisplay.setProvider(provider1);
@@ -140,7 +158,7 @@ public class AirportMap extends PApplet {
 	        map.mapDisplay.setProvider(provider2);
 	    }
 	}
-	
+	// Button 
 	private void addButton() {
 		update(mouseX, mouseY);
 		if (rectOver) {
@@ -198,6 +216,39 @@ public class AirportMap extends PApplet {
 		} else {
 			return false;
 		}
+	}
+	// Clock
+	public void addClock() {		  
+		// Draw the clock background
+		fill(80);
+		noStroke();
+		ellipse(cx, cy, clockDiameter, clockDiameter);
+		  
+		// Angles for sin() and cos() start at 3 o'clock;
+		// subtract HALF_PI to make them start at the top
+		float s = map(second(), 0, 60, 0, TWO_PI) - HALF_PI;
+		float m = map(minute() + norm(second(), 0, 60), 0, 60, 0, TWO_PI) - HALF_PI; 
+		float h = map(hour() + norm(minute(), 0, 60), 0, 24, 0, TWO_PI * 2) - HALF_PI;
+		  
+		// Draw the hands of the clock
+		stroke(255);
+		strokeWeight(1);
+		line(cx, cy, cx + cos(s) * secondsRadius, cy + sin(s) * secondsRadius);
+		strokeWeight(2);
+		line(cx, cy, cx + cos(m) * minutesRadius, cy + sin(m) * minutesRadius);
+		strokeWeight(4);
+		line(cx, cy, cx + cos(h) * hoursRadius, cy + sin(h) * hoursRadius);
+		  
+		// Draw the minute ticks
+		strokeWeight(2);
+		beginShape(POINTS);
+		for (int a = 0; a < 360; a+=6) {
+		  float angle = radians(a);
+		  float x = cx + cos(angle) * secondsRadius;
+		  float y = cy + sin(angle) * secondsRadius;
+		  vertex(x, y);
+		}
+		endShape();
 	}
 	
 	// Hover Method
