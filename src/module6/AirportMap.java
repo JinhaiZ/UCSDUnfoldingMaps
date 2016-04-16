@@ -132,14 +132,16 @@ public class AirportMap extends PApplet {
 		rectY = height/2-rectSize/2;
 		ellipseMode(CENTER);
 		// Setup clock
-		stroke(255);
-		int radius = min(width, height) / 2;
+		//stroke(255);
+		int radius = min(width, height) / 15;
 		secondsRadius = (float) (radius * 0.72);
 		minutesRadius = (float) (radius * 0.60);
 		hoursRadius = (float) (radius * 0.50);
 		clockDiameter = (float) (radius * 1.8);		  
-		cx = width / 2;
-		cy = height / 2;
+		//cx = 110;
+		//cy = 300;
+		// Setup 2nd clock
+
 	}
 	
 	public void draw() {
@@ -147,7 +149,9 @@ public class AirportMap extends PApplet {
 		map.draw();
 		addKey();
 		addButton();
-		//addClock();
+		// clock 1
+		addClock(110,300,0,"Current Time");
+		addClock(110,430,5,"Local Time");
 		//map.getZoomLevel();
 	}
 	// keyboard
@@ -218,8 +222,12 @@ public class AirportMap extends PApplet {
 		}
 	}
 	// Clock
-	public void addClock() {		  
-		// Draw the clock background
+	public void addClock(int cx, int cy, float offset, String name) {		  
+		// Draw the clock background		
+		fill(0);
+		textAlign(LEFT, CENTER);
+		textSize(16);
+		text(name, cx/2, cy-70);
 		fill(80);
 		noStroke();
 		ellipse(cx, cy, clockDiameter, clockDiameter);
@@ -228,7 +236,7 @@ public class AirportMap extends PApplet {
 		// subtract HALF_PI to make them start at the top
 		float s = map(second(), 0, 60, 0, TWO_PI) - HALF_PI;
 		float m = map(minute() + norm(second(), 0, 60), 0, 60, 0, TWO_PI) - HALF_PI; 
-		float h = map(hour() + norm(minute(), 0, 60), 0, 24, 0, TWO_PI * 2) - HALF_PI;
+		float h = map(hour()+ offset + norm(minute(), 0, 60), 0, 24, 0, TWO_PI * 2) - HALF_PI;
 		  
 		// Draw the hands of the clock
 		stroke(255);
@@ -294,12 +302,12 @@ public class AirportMap extends PApplet {
 		
 		fill(0);
 		textAlign(LEFT, CENTER);
-		textSize(16);
-		text("Airport", xbase+25, ybase+25);
+		textSize(20);
+		text("Airport Map", xbase+25, ybase+25);
 
-		textSize(12);
+		textSize(16);
 		text("Airport Altitude", xbase+25, ybase+50);
-		
+		stroke(0);
 		fill(color(255, 0, 0));
 		ellipse(xbase+35, ybase+80, 12, 12);
 		fill(color(255, 128, 0));
@@ -310,7 +318,7 @@ public class AirportMap extends PApplet {
 		ellipse(xbase+35, ybase+140, 12, 12);
 		fill(color(51, 153, 255));
 		ellipse(xbase+35, ybase+160, 12, 12);
-		
+		textSize(12);
 		textAlign(LEFT, CENTER);
 		fill(0, 0, 0);
 		text("> 3000m", xbase+50, ybase+80);
@@ -318,7 +326,6 @@ public class AirportMap extends PApplet {
 		text("2000m ~ 1000m", xbase+50, ybase+120);
 		text("1000m ~ 0m", xbase+50, ybase+140);
 		text("< 0 m", xbase+50, ybase+160);
-		
 	}
 	
 
