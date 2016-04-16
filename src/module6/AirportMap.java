@@ -39,20 +39,19 @@ public class AirportMap extends PApplet {
 	private List<Marker> airportMarkers;
 	List<Marker> routeList;
 	// Setup buttons
-	int rectX, rectY;      // Position of square button
-	int circleX, circleY;  // Position of circle button
-	int rectSize = 90;     // Diameter of rect
-	int circleSize = 93;   // Diameter of circle
-	int rectColor, circleColor, baseColor;
-	int rectHighlight, circleHighlight;
+	//int rectX, rectY;      // Position of square button
+	//int rectSize = 20;     // Diameter of rect
+	//int circleSize = 93;   // Diameter of circle
+	int rectColor, baseColor;
+	int rectHighlight;
 	AbstractMapProvider currentProvider;
-	boolean rectOver = false;
-	boolean circleOver = false;
+	boolean button1Over = false;
+	boolean button2Over = false;
 	// Hover method
 	private CommonMarker lastSelected;
 	private CommonMarker lastClicked;
 	// Clock
-	int cx, cy;
+	//int cx, cy;
 	float secondsRadius;
 	float minutesRadius;
 	float hoursRadius;
@@ -121,16 +120,10 @@ public class AirportMap extends PApplet {
 		
 		// Setup button
 		rectColor = color(0);
-		rectHighlight = color(51);
-		circleColor = color(255);
-		circleHighlight = color(204);
+		rectHighlight = color(204);
 		baseColor = color(102);
 		currentProvider = provider1;
-		circleX = width/2+circleSize/2+10;
-		circleY = height/2;
-		rectX = width/2-rectSize-10;
-		rectY = height/2-rectSize/2;
-		ellipseMode(CENTER);
+		
 		// Setup clock
 		//stroke(255);
 		int radius = min(width, height) / 15;
@@ -138,9 +131,6 @@ public class AirportMap extends PApplet {
 		minutesRadius = (float) (radius * 0.60);
 		hoursRadius = (float) (radius * 0.50);
 		clockDiameter = (float) (radius * 1.8);		  
-		//cx = 110;
-		//cy = 300;
-		// Setup 2nd clock
 
 	}
 	
@@ -148,10 +138,10 @@ public class AirportMap extends PApplet {
 		background(0);
 		map.draw();
 		addKey();
-		addButton();
+		addButton(150,550,20);
 		// clock 1
-		addClock(110,300,0,"Current Time");
-		addClock(110,430,5,"Local Time");
+		addClock(110,320,0,"Current Time");
+		addClock(110,450,5,"Local Time");
 		//map.getZoomLevel();
 	}
 	// keyboard
@@ -163,42 +153,57 @@ public class AirportMap extends PApplet {
 	    }
 	}
 	// Button 
-	private void addButton() {
-		update(mouseX, mouseY);
-		if (rectOver) {
+	private void addButton(int rectX, int rectY, int rectSize) {
+		// text
+		fill(0);
+		textAlign(LEFT, CENTER);
+		textSize(16);
+		text("Map Provider", rectX-90, rectY-30);
+		text("Selection", rectX-70, rectY-12); 
+		// button
+		update(mouseX, mouseY, rectX, rectY, rectSize);
+		if (button1Over) {
 		  fill(rectHighlight);
 		} else {
 		  fill(rectColor);
 		}
+		// text
+		textSize(12);
+		text("Google Terran", rectX-100, rectY+6);
+		
+		// button
 		stroke(255);
 		rect(rectX, rectY, rectSize, rectSize);
 		  
-		if (circleOver) {
-		  fill(circleHighlight);
+		if (button2Over) {
+		  fill(rectHighlight);
 		} else {
-		  fill(circleColor);
+		  fill(rectColor);
 		}
-		stroke(0);
-		ellipse(circleX, circleY, circleSize, circleSize);
+		//text
+		textSize(12);
+		text("Microsoft Hybrid", rectX-100, rectY+36);
+		stroke(255);
+		rect(rectX, rectY+30, rectSize, rectSize);
 	}
 	
-	void update(int x, int y) {
-		if ( overCircle(circleX, circleY, circleSize) ) {
-			circleOver = true;
-		    rectOver = false;
+	void update(int x, int y, int rectX, int rectY, int rectSize) {
+		if ( overRect(rectX, rectY+30, rectSize, rectSize)  ) {
+			button2Over = true;
+			button1Over = false;
 		    } else if ( overRect(rectX, rectY, rectSize, rectSize) ) {
-		    	rectOver = true;
-		    	circleOver = false;
+		    	button1Over = true;
+		    	button2Over = false;
 		    } else {
-		    	circleOver = rectOver = false;
+		    	button2Over = button1Over = false;
 		}
 	}
 	
 	public void mousePressed() {
-		if (circleOver) {
+		if (button2Over) {
 			map.mapDisplay.setProvider(provider2);
 		}
-		if (rectOver) {
+		if (button1Over) {
 			map.mapDisplay.setProvider(provider1);
 		}
 	}
@@ -212,15 +217,6 @@ public class AirportMap extends PApplet {
 		}
 	}
 	
-	boolean overCircle(int x, int y, int diameter) {
-		float disX = x - mouseX;
-		float disY = y - mouseY;
-		if (sqrt(sq(disX) + sq(disY)) < diameter/2 ) {
-			return true;
-		} else {
-			return false;
-		}
-	}
 	// Clock
 	public void addClock(int cx, int cy, float offset, String name) {		  
 		// Draw the clock background		
