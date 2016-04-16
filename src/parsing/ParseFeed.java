@@ -176,7 +176,10 @@ public class ParseFeed {
 				point.putProperty("code", columns[5]);
 			}
 			
-			point.putProperty("altitude", columns[8 + i]);
+			point.addProperty("altitude", columns[8 + i]);
+			point.addProperty("offset", columns[9 + i]);
+			point.addProperty("dst", columns[10 + i]);
+			point.addProperty("timezone", columns[11 + i]);
 			
 			features.add(point);
 		}
