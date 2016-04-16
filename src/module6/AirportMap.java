@@ -13,7 +13,6 @@ import de.fhpotsdam.unfolding.marker.SimplePointMarker;
 import de.fhpotsdam.unfolding.providers.AbstractMapProvider;
 import de.fhpotsdam.unfolding.providers.Google;
 import de.fhpotsdam.unfolding.providers.Microsoft;
-import de.fhpotsdam.unfolding.providers.Yahoo;
 import de.fhpotsdam.unfolding.utils.MapUtils;
 import de.fhpotsdam.unfolding.geo.Location;
 import parsing.ParseFeed;
@@ -33,19 +32,33 @@ public class AirportMap extends PApplet {
 	private static final long serialVersionUID = 1L;
 	// The map
 	UnfoldingMap map;
+	// Setup providers
 	AbstractMapProvider provider1;
 	AbstractMapProvider provider2;
-	AbstractMapProvider provider3;
-	private List<Marker> airportList;
+	// Setup data
+	private List<Marker> airportMarkers;
 	List<Marker> routeList;
+	// Setup buttons
+	int rectX, rectY;      // Position of square button
+	int circleX, circleY;  // Position of circle button
+	int rectSize = 90;     // Diameter of rect
+	int circleSize = 93;   // Diameter of circle
+	int rectColor, circleColor, baseColor;
+	int rectHighlight, circleHighlight;
+	AbstractMapProvider currentProvider;
+	boolean rectOver = false;
+	boolean circleOver = false;
+	// Hover method
+	private CommonMarker lastSelected;
+	private CommonMarker lastClicked;
+
+	
 	
 	public void setup() {
 		// setting up PAppler
 		size(900,700, OPENGL);
 		provider1 = new Google.GoogleMapProvider();
-	    provider2 = new Microsoft.AerialProvider();
-	    provider3 = new Microsoft.HybridProvider() ;
-		
+	    provider2 = new Microsoft.HybridProvider();
 		
 		// setting up map and default events
 		map = new UnfoldingMap(this, 200, 50, 650, 600, provider1);
@@ -55,7 +68,7 @@ public class AirportMap extends PApplet {
 		List<PointFeature> features = ParseFeed.parseAirports(this, "airports.dat");
 		
 		// list for markers, hashmap for quicker access when matching with routes
-		airportList = new ArrayList<Marker>();
+		airportMarkers = new ArrayList<Marker>();
 		HashMap<Integer, Location> airports = new HashMap<Integer, Location>();
 		
 		// create markers from features
@@ -63,7 +76,8 @@ public class AirportMap extends PApplet {
 			AirportMarker m = new AirportMarker(feature);
 	
 			m.setRadius(5);
-			airportList.add(m);
+			//System.out.println(m.getProperties());
+			airportMarkers.add(m);
 			
 			// put airport in hashmap with OpenFlights unique id for key
 			airports.put(Integer.parseInt(feature.getId()), feature.getLocation());
@@ -93,30 +107,131 @@ public class AirportMap extends PApplet {
 			//UNCOMMENT IF YOU WANT TO SEE ALL ROUTES
 			//routeList.add(sl);
 		}
-		
-		
-		
 		//UNCOMMENT IF YOU WANT TO SEE ALL ROUTES
 		//map.addMarkers(routeList);
 		
-		//map.addMarkers(airportList);
+		map.addMarkers(airportMarkers);
 		
+		// Setup button
+		rectColor = color(0);
+		rectHighlight = color(51);
+		circleColor = color(255);
+		circleHighlight = color(204);
+		baseColor = color(102);
+		currentProvider = provider1;
+		circleX = width/2+circleSize/2+10;
+		circleY = height/2;
+		rectX = width/2-rectSize-10;
+		rectY = height/2-rectSize/2;
+		ellipseMode(CENTER);
 	}
 	
 	public void draw() {
 		background(0);
 		map.draw();
-		addKey();		
+		addKey();
+		addButton();
+		//map.getZoomLevel();
 	}
 	public void keyPressed() {
 	    if (key == '1') {
 	        map.mapDisplay.setProvider(provider1);
 	    } else if (key == '2') {
 	        map.mapDisplay.setProvider(provider2);
-	    } else if (key == '3') {
-	        map.mapDisplay.setProvider(provider3);
 	    }
 	}
+	
+	private void addButton() {
+		update(mouseX, mouseY);
+		if (rectOver) {
+		  fill(rectHighlight);
+		} else {
+		  fill(rectColor);
+		}
+		stroke(255);
+		rect(rectX, rectY, rectSize, rectSize);
+		  
+		if (circleOver) {
+		  fill(circleHighlight);
+		} else {
+		  fill(circleColor);
+		}
+		stroke(0);
+		ellipse(circleX, circleY, circleSize, circleSize);
+	}
+	
+	void update(int x, int y) {
+		if ( overCircle(circleX, circleY, circleSize) ) {
+			circleOver = true;
+		    rectOver = false;
+		    } else if ( overRect(rectX, rectY, rectSize, rectSize) ) {
+		    	rectOver = true;
+		    	circleOver = false;
+		    } else {
+		    	circleOver = rectOver = false;
+		}
+	}
+	
+	public void mousePressed() {
+		if (circleOver) {
+			map.mapDisplay.setProvider(provider2);
+		}
+		if (rectOver) {
+			map.mapDisplay.setProvider(provider1);
+		}
+	}
+	
+	boolean overRect(int x, int y, int width, int height)  {
+		if (mouseX >= x && mouseX <= x+width && 
+				mouseY >= y && mouseY <= y+height) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	boolean overCircle(int x, int y, int diameter) {
+		float disX = x - mouseX;
+		float disY = y - mouseY;
+		if (sqrt(sq(disX) + sq(disY)) < diameter/2 ) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	// Hover Method
+	@Override
+	public void mouseMoved()
+	{
+		// clear the last selection
+		if (lastSelected != null) {
+			lastSelected.setSelected(false);
+			lastSelected = null;
+		
+		}
+		selectMarkerIfHover(airportMarkers);
+		//loop();
+	}
+	// If there is a marker selected 
+		private void selectMarkerIfHover(List<Marker> markers)
+		{
+			// Abort if there's already a marker selected
+			if (lastSelected != null) {
+				return;
+			}
+			
+			for (Marker m : markers) 
+			{
+				CommonMarker marker = (CommonMarker)m;
+				if (marker.isInside(map,  mouseX, mouseY)) {
+					lastSelected = marker;
+					marker.setSelected(true);
+					return;
+				}
+			}
+		}
+	
 	private void addKey() {	
 		// Remember you can use Processing's graphics methods here
 		fill(255, 250, 240);
