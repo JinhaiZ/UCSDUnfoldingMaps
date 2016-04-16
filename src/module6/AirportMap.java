@@ -2,6 +2,7 @@ package module6;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import de.fhpotsdam.unfolding.UnfoldingMap;
@@ -37,7 +38,7 @@ public class AirportMap extends PApplet {
 	AbstractMapProvider provider2;
 	// Setup data
 	private List<Marker> airportMarkers;
-	List<Marker> routeList;
+	List<Marker> routeMarkers;
 	// Setup buttons
 	//int rectX, rectY;      // Position of square button
 	//int rectSize = 20;     // Diameter of rect
@@ -85,6 +86,7 @@ public class AirportMap extends PApplet {
 			//System.out.println(m.getProperties());
 			airportMarkers.add(m);
 			
+			
 			// put airport in hashmap with OpenFlights unique id for key
 			airports.put(Integer.parseInt(feature.getId()), feature.getLocation());
 		
@@ -93,7 +95,7 @@ public class AirportMap extends PApplet {
 		
 		// parse route data
 		List<ShapeFeature> routes = ParseFeed.parseRoutes(this, "routes.dat");
-		routeList = new ArrayList<Marker>();
+		routeMarkers = new ArrayList<Marker>();
 		for(ShapeFeature route : routes) {
 			
 			// get source and destination airportIds
@@ -109,12 +111,15 @@ public class AirportMap extends PApplet {
 			SimpleLinesMarker sl = new SimpleLinesMarker(route.getLocations(), route.getProperties());
 		
 			//System.out.println(sl.getProperties());
+			//int sou = Integer.parseInt((String)sl.getProperty("source"));
+			//System.out.println(sou);
 			
 			//UNCOMMENT IF YOU WANT TO SEE ALL ROUTES
-			//routeList.add(sl);
+			sl.setHidden(true);
+			routeMarkers.add(sl);
 		}
 		//UNCOMMENT IF YOU WANT TO SEE ALL ROUTES
-		//map.addMarkers(routeList);
+		map.addMarkers(routeMarkers);
 		
 		map.addMarkers(airportMarkers);
 		
@@ -256,6 +261,9 @@ public class AirportMap extends PApplet {
 	}
 	
 	// Hover Method
+	/** Event handler that gets called automatically when the 
+	 * mouse moves.
+	 */
 	@Override
 	public void mouseMoved()
 	{
@@ -269,23 +277,85 @@ public class AirportMap extends PApplet {
 		//loop();
 	}
 	// If there is a marker selected 
-		private void selectMarkerIfHover(List<Marker> markers)
+	private void selectMarkerIfHover(List<Marker> markers)
+	{
+	// Abort if there's already a marker selected
+		if (lastSelected != null) {
+			return;
+		}
+			
+		for (Marker m : markers) 
 		{
-			// Abort if there's already a marker selected
-			if (lastSelected != null) {
+			CommonMarker marker = (CommonMarker)m;
+			if (marker.isInside(map,  mouseX, mouseY)) {
+				lastSelected = marker;
+				marker.setSelected(true);
 				return;
 			}
-			
-			for (Marker m : markers) 
-			{
-				CommonMarker marker = (CommonMarker)m;
-				if (marker.isInside(map,  mouseX, mouseY)) {
-					lastSelected = marker;
-					marker.setSelected(true);
-					return;
+		}
+	}
+	/** The event handler for mouse clicks
+	 * 
+	*/
+	@Override
+	public void mouseClicked()
+	{
+		if (lastClicked != null) {
+			unhideMarkers();
+			hideMarkers();
+			lastClicked = null;
+		}
+		else if (lastClicked == null) 
+		{
+			checkAirPortsForClick();
+		}
+	}
+	private void checkAirPortsForClick()
+	{
+		if (lastClicked != null) return;
+		// Loop over the earthquake markers to see if one of them is selected
+		for (Marker m : airportMarkers) {
+			AirportMarker marker = (AirportMarker)m;
+			if (!marker.isHidden() && marker.isInside(map, mouseX, mouseY)) {
+				lastClicked = marker;
+				// Hide all the other earthquakes and hide
+				int id = Integer.parseInt((String) m.getProperty("id"));
+				HashSet<Integer> showAirports = new HashSet<Integer>();
+				showAirports.add(id);
+				for (Marker route: routeMarkers ) {
+					int dst = Integer.parseInt((String) route.getProperty("destination"));
+					int sou = Integer.parseInt((String) route.getProperty("source"));
+					if (id == dst) {
+						route.setHidden(false);
+						showAirports.add(sou);
+					} else if (id == sou) {
+						route.setHidden(false);
+						showAirports.add(dst);
+					}
+				}
+				
+				for (Marker mhide: airportMarkers) {
+					int idx = Integer.parseInt((String) mhide.getProperty("id"));
+					if (!showAirports.contains(idx)) {
+						mhide.setHidden(true);
+					}
 				}
 			}
 		}
+	}
+	
+	// loop over and unhide all markers
+	private void unhideMarkers() {
+		for(Marker marker : airportMarkers) {
+			marker.setHidden(false);
+		}
+	}
+	private void hideMarkers() {
+		for(Marker marker : routeMarkers) {
+			marker.setHidden(true);
+		}
+	}
+	
 	
 	private void addKey() {	
 		// Remember you can use Processing's graphics methods here
