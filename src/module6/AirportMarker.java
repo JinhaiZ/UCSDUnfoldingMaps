@@ -1,10 +1,11 @@
 package module6;
-
+//Java utilities libraries
 import java.util.List;
-
+//Unfolding libraries
 import de.fhpotsdam.unfolding.data.Feature;
 import de.fhpotsdam.unfolding.data.PointFeature;
 import de.fhpotsdam.unfolding.marker.SimpleLinesMarker;
+//Processing library
 import processing.core.PConstants;
 import processing.core.PGraphics;
 
@@ -27,8 +28,23 @@ public class AirportMarker extends CommonMarker {
 	
 	@Override
 	public void drawMarker(PGraphics pg, float x, float y) {
-		pg.fill(11);
-		pg.ellipse(x, y, 5, 5);
+		// offset -12 ~ +13
+		float offset = getOffset();
+		// altitude -1226 ~ +14472
+		int altitude = getAltitude();
+		if (altitude > 3000) {
+			pg.fill(255,0,0);//red
+		} else if (altitude > 2000 ) {
+			pg.fill(255,128,0);//orange
+		} else if (altitude > 1000) {
+			pg.fill(255,255,51);//yellow
+		} else if (altitude > 0) {
+			pg.fill(128,255,0);//green
+		} else {
+			pg.fill(51,153,255);//blue
+		}
+		
+		pg.ellipse(x, y, 10, 10);
 		
 		
 	}
@@ -69,5 +85,14 @@ public class AirportMarker extends CommonMarker {
 	{
 		return getStringProperty("timezone");
 	}
+	private float getOffset()
+	{
+		return Float.parseFloat(getStringProperty("offset"));
+	}
+	private int getAltitude()
+	{
+		return Integer.parseInt(getStringProperty("altitude"));
+	}
+	
 	
 }
