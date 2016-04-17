@@ -146,7 +146,7 @@ public class AirportMap extends PApplet {
 		addButton(150,550,20);
 		// clock 1
 		addClock(110,320,0,"Current Time");
-		addClock(110,450,5,"Local Time");
+		addClock(110,450,airPortClicked()-1,"Local Time");
 		//map.getZoomLevel();
 	}
 	// keyboard
@@ -174,7 +174,7 @@ public class AirportMap extends PApplet {
 		}
 		// text
 		textSize(12);
-		text("Google Terran", rectX-100, rectY+6);
+		text("Google Terrain", rectX-100, rectY+6);
 		
 		// button
 		stroke(255);
@@ -219,6 +219,13 @@ public class AirportMap extends PApplet {
 			return true;
 		} else {
 			return false;
+		}
+	}
+	public float airPortClicked() {
+		if (lastClicked != null) {
+			return Float.parseFloat(lastClicked.getProperty("offset").toString());
+		} else {
+			return 0;
 		}
 	}
 	
